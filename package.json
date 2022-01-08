@@ -1,15 +1,14 @@
 {
-  "name": "server",
+  "name": "goal-tracker-server",
   "version": "1.0.0",
-  "description": "",
+  "description": "goal tracking application using Node and Express",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "start": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "node build index.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Andy Guice",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",

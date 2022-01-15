@@ -43,7 +43,6 @@ export const createGoal = async (req, res) => {
 
     if (goal?.title?.trim()?.length === 0) return res.status(200).json({ error: "No title given" });
     if (goal?.description?.trim()?.length === 0) return res.status(200).json({ error: "No description given" });
-    if (goal?.cadence?.trim()?.length === 0) return res.status(200).json({ error: "No cadence given" })
 
     const newGoal = new Goal({
       title: goal.title,
@@ -51,6 +50,7 @@ export const createGoal = async (req, res) => {
       cadence: goal.cadence,
       complete: goal.complete,
       userId: goal.userId,
+      quantity: goal.quantity
     });
     await newGoal.save();
     res.status(201).json(newGoal);

@@ -6,6 +6,7 @@ const goalSchema = mongoose.Schema({
   userId: { type: String, required: true },
   cadence: { type: String, required: true },
   complete: { type: Boolean, required: true },
+  quantity: { type: Number, required: true },
 });
 
 const Goal = mongoose.model("goal", goalSchema);

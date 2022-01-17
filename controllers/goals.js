@@ -50,7 +50,9 @@ export const createGoal = async (req, res) => {
       cadence: goal.cadence,
       complete: goal.complete,
       userId: goal.userId,
-      quantity: goal.quantity
+      quantity: goal.quantity,
+      createdOn: goal.createdOn,
+      updatedOn: goal.updatedOn,
     });
     await newGoal.save();
     res.status(201).json(newGoal);

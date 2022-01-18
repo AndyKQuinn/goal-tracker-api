@@ -7,8 +7,8 @@ const goalSchema = mongoose.Schema({
   cadence: { type: String, required: true },
   complete: { type: Boolean, required: true },
   quantity: { type: Number, required: true },
-  createdOn: { type: Date, required: true },
-  updatedOn: { type: Date, required: true },
+  createdOn: { type: String, required: true },
+  updatedOn: { type: String, required: true },
 });
 
 const Goal = mongoose.model("goal", goalSchema);

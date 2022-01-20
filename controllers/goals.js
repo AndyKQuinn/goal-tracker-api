@@ -12,11 +12,24 @@ export const getAllGoals = async (req, res) => {
   }
 }
 
-export const getUserGoals = async (req, res) => {
+export const getUserGoalsAll = async (req, res) => {
   const { id } = req.params;
 
   try {
     const goals = await Goal.find({ userId: id }).sort({ _id: -1 })
+    res.status(200).json({ data: goals })
+  }
+  catch (error) {
+    res.status(404).json({ message: error.message })
+  }
+}
+
+export const getUserGoalsToday = async (req, res) => {
+  const { id } = req.params;
+  const today = new Date()
+
+  try {
+    const goals = await Goal.find({ userId: id, createdOn: today }).sort({ _id: -1 })
     res.status(200).json({ data: goals })
   }
   catch (error) {

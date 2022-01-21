@@ -1,12 +1,5 @@
 import mongoose from 'mongoose';
 import Goal from '../models/goal.js';
-import { 
-  addDays,
-  startOfWeek,
-  endOfWeek,
-  startOfMonth,
-  endOfMonth
-} from 'date-fns';
 
 export const getAllGoals = async (req, res) => {
 
@@ -20,29 +13,8 @@ export const getAllGoals = async (req, res) => {
 }
 
 export const getUserGoals = async (req, res) => {
-  const { id, cadence } = req.params;
-  const today = new Date()
+  const { id } = req.params;
   const mongoQuery = { userId: id }
-
-  switch (cadence) {
-    case 'daily':
-      const yesterday = addDays(today, -1)
-      const tomorrow = addDays(today, 1)
-      mongoQuery.createdOn = { $gt: yesterday, $lt: tomorrow }
-      break
-    case 'weekly':
-      const firstDayOfWeek = startOfWeek(today)
-      const lastDayOfWeek = endOfWeek(today)
-      mongoQuery.createdOn = { $gte: firstDayOfWeek, $lte: lastDayOfWeek }
-      break
-    case 'monthly':
-      const firstDayOfMonth = startOfMonth(today)
-      const lastDayOfMonth = endOfMonth(today)
-      mongoQuery.createdOn = { $gte: firstDayOfMonth, $lte: lastDayOfMonth }
-      break
-    default:
-      break
-  }
 
   try {
     const goals = await Goal.find(mongoQuery).sort({ _id: -1 })

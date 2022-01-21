@@ -12,7 +12,7 @@ import auth from "../middlewares/auth.js";
 const router = express.Router();
 
 router.get("/", getAllGoals);
-router.get("/users/:id/:cadence", getUserGoals);
+router.get("/users/:id", getUserGoals);
 router.get("/:id", getGoal);
 router.post("/", createGoal);
 router.patch("/:id", auth, updateGoal);

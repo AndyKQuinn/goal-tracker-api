@@ -3,9 +3,8 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import userRouter from './routes/user.js';
-import formsRouter from './routes/forms.js';
-import answersRouter from './routes/answers.js';
 import goalsRouter from './routes/goals.js';
+import tasksRouter from './routes/tasks.js';
 
 dotenv.config();
 const app = express();
@@ -16,9 +15,8 @@ app.use(express.urlencoded({ limit: '30mb', extended: true }))
 app.use(cors());
 
 app.use('/user', userRouter);
-app.use('/forms', formsRouter);
 app.use('/goals', goalsRouter);
-app.use('/answers', answersRouter);
+app.use('/tasks', tasksRouter);
 
 mongoose.connect(process.env.CONNECTION_URL, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => app.listen(PORT, () => console.log(`Server running on port: ${PORT}`)))

@@ -7,8 +7,8 @@ const goalSchema = mongoose.Schema({
   userId: { type: String, required: true },
   createdOn: { type: Date, required: true },
   updatedOn: { type: Date, required: true },
-  start: { type: Date },
-  end: { type: Date },
+  startOn: { type: Date },
+  endOn: { type: Date },
   active: { type: Boolean },
   tasks: { type: [Task.schema] }
 });

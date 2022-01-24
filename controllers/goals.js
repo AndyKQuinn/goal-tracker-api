@@ -48,12 +48,13 @@ export const createGoal = async (req, res) => {
     const newGoal = new Goal({
       title: goal.title,
       description: goal.description,
-      cadence: goal.cadence,
       complete: goal.complete,
       userId: goal.userId,
       quantity: goal.quantity,
       createdOn: goal.createdOn,
       updatedOn: goal.updatedOn,
+      startOn: goal.startOn,
+      endOn: goal.endOn,
     });
     await newGoal.save();
     res.status(201).json(newGoal);

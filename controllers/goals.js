@@ -13,7 +13,7 @@ export const getAllGoals = async (req, res) => {
 }
 
 export const getUserGoals = async (req, res) => {
-  const { id } = req.params;
+  const { id, date } = req.params;
   const mongoQuery = { userId: id }
 
   try {
@@ -87,7 +87,7 @@ export const deleteGoal = async (req, res) => {
     console.log(id);
     await Goal.findByIdAndRemove(id);
 
-    res.status(201).json({ message: "Movie deleted successfully." });
+    res.status(201).json({ message: "Goal deleted successfully." });
   }
   catch (error) {
     res.status(401).json({ message: error.message });

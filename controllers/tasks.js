@@ -72,7 +72,7 @@ export const deleteTask = async (req, res) => {
     console.log(id);
     await Task.findByIdAndRemove(id);
 
-    res.status(201).json({ message: "Movie deleted successfully." });
+    res.status(201).json({ message: "Task deleted successfully." });
   }
   catch (error) {
     res.status(401).json({ message: error.message });

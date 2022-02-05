@@ -1,14 +1,16 @@
 import mongoose from 'mongoose';
 import Task from '../models/task.js';
 
-export const getAllTasks = async (req, res) => {
+export const getGoalTasks = async (req, res) => {
+  const { id } = req.params;
+  const mongoQuery = { _id: id }
 
   try {
-    const tasks = await Task.find().sort({ _id: -1 });
-    res.status(200).json({ data: tasks });
+    const tasks = await Task.find(mongoQuery).sort({ _id: -1 })
+    res.status(200).json({ data: tasks })
   }
   catch (error) {
-    res.status(404).json({ message: error.message });
+    res.status(404).json({ message: error.message })
   }
 }
 
@@ -35,9 +37,7 @@ export const createTask = async (req, res) => {
     const newTask = new Task({
       title: task.title,
       description: task.description,
-      complete: task.complete,
       userId: task.userId,
-      quantity: task.quantity,
       createdOn: task.createdOn,
       updatedOn: task.updatedOn,
     });
@@ -69,7 +69,6 @@ export const deleteTask = async (req, res) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send(`No task with id: ${id}`);
 
-    console.log(id);
     await Task.findByIdAndRemove(id);
 
     res.status(201).json({ message: "Task deleted successfully." });

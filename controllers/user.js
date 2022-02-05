@@ -25,7 +25,8 @@ export const signin = async (req, res) => {
             },
             process.env.JWT_SECRET,
             {
-                expiresIn: "1h"
+                // expiresIn: "1h"
+                expiresIn: "24h"
             }
         );
 
@@ -70,7 +71,8 @@ export const signup = async (req, res) => {
             },
             process.env.JWT_SECRET,
             {
-                expiresIn: "4h"
+                // expiresIn: "4h"
+                expiresIn: "24h"
             });
 
         res.status(201).json({ result, token });

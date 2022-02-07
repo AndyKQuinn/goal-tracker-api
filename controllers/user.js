@@ -1,85 +1,123 @@
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import dotenv from 'dotenv';
-import User from "../models/user.js";
-import * as EmailValidator from 'email-validator';
+import bcrypt from "bcryptjs"
+import jwt from "jsonwebtoken"
+import dotenv from 'dotenv'
+import User from "../models/user.js"
+import * as EmailValidator from 'email-validator'
+import { randomStringGenerator } from '../helpers/auth.js'
 
-dotenv.config();
+dotenv.config()
 
 export const signin = async (req, res) => {
-    const { email, password } = req.body;
+  const { email, password } = req.body
 
+  // no password means we're already authed via social login. check if user exists and create if needed
+  if (!password) {
+    socialLogin(req, res)
+  } else {
     try {
-        const oldUser = await User.findOne({ email });
+      const user = await User.findOne({ email })
 
-        if (!oldUser) return res.status(200).json({ error: "Invalid login or password" });
+      if (!user) return res.status(200).json({ error: "Invalid login or password" })
 
-        const isPasswordCorrect = await bcrypt.compare(password, oldUser.password);
+      const isPasswordCorrect = await bcrypt.compare(password, user.password)
 
-        if (!isPasswordCorrect) return res.status(200).json({ error: "Invalid login or password" });
+      if (!isPasswordCorrect) return res.status(200).json({ error: "Invalid login or password" })
 
-        const token = jwt.sign(
-            {
-                email: oldUser.email,
-                id: oldUser._id
-            },
-            process.env.JWT_SECRET,
-            {
-                // expiresIn: "1h"
-                expiresIn: "24h"
-            }
-        );
+      const token = jwt.sign(
+        {
+          email: user.email,
+          id: user._id
+        },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "4h"
+        }
+      )
 
-        res.status(200).json({ result: oldUser, token });
+      res.status(200).json({ result: user, token })
     } catch (err) {
-        res.status(500).json({ message: "Something went wrong" });
+      res.status(500).json({ message: "Something went wrong" })
     }
-};
+  }
+}
+
+const socialLogin = async (req, res) => {
+  const {
+    email,
+    familyName,
+    givenName,
+    googleID,
+    imageUrl
+  } = req.body
+
+  try {
+    const user = await User.findOne({ email })
+
+    if (!user) {
+      const newUser = new User()
+
+      newUser.name = `${givenName} ${familyName}`
+      newUser.email = email
+      newUser.id = googleID
+      newUser.password = randomStringGenerator(20)
+      newUser.admin = false
+      newUser.imageUrl = imageUrl
+
+      const result = User.create(newUser)
+      result && res.status(200).json({ message: "New social auth user created successfully" })
+    }
+
+
+  } catch (err) {
+    res.status(500).json({ message: "Something went wrong" })
+  }
+}
 
 export const signup = async (req, res) => {
-    const {
-        firstName,
-        lastName,
+  const {
+    firstName,
+    lastName,
+    email,
+    password
+  } = req.body
+
+  try {
+    if (!firstName || firstName?.trim()?.length === 0) return res.status(200).json({ error: "No first name given" })
+    if (!lastName || lastName?.trim()?.length === 0) return res.status(200).json({ error: "No last name name given" })
+    if (!email || email?.trim()?.length === 0) return res.status(200).json({ error: "No email given" })
+    if (!EmailValidator.validate(email)) return res.status(200).json({ error: "Wrong email format" })
+    if (!password || password?.trim()?.length === 0) return res.status(200).json({ error: "No password given" })
+
+    const user = await User.findOne({ email })
+
+    if (user) return res.status(200).json({ error: "User already exists" })
+
+    const hashedPassword = await bcrypt.hash(password, 12)
+
+    const result = await User.create(
+      {
         email,
-        password
-    } = req.body;
+        password: hashedPassword,
+        name: `${firstName} ${lastName}`,
+        admin: false
+      })
 
-    try {
-        if (!firstName || firstName?.trim()?.length === 0) return res.status(200).json({ error: "No first name given" });
-        if (!lastName || lastName?.trim()?.length === 0) return res.status(200).json({ error: "No last name name given" });
-        if (!email || email?.trim()?.length === 0) return res.status(200).json({ error: "No email given" });
-        if (!EmailValidator.validate(email)) return res.status(200).json({ error: "Wrong email format" });
-        if (!password || password?.trim()?.length === 0) return res.status(200).json({ error: "No password given" });
+    const token = jwt.sign(
+      {
+        email: result.email,
+        id: result._id
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "4h"
+      }
+    )
 
-        const oldUser = await User.findOne({ email });
+    res.status(201).json({ result, token })
 
-        if (oldUser) return res.status(200).json({ error: "User already exists" });
+  } catch (error) {
 
-        const hashedPassword = await bcrypt.hash(password, 12);
-
-        const result = await User.create(
-            {
-                email,
-                password: hashedPassword,
-                name: `${firstName} ${lastName}`
-            });
-
-        const token = jwt.sign(
-            {
-                email: result.email,
-                id: result._id
-            },
-            process.env.JWT_SECRET,
-            {
-                // expiresIn: "4h"
-                expiresIn: "24h"
-            });
-
-        res.status(201).json({ result, token });
-
-    } catch (error) {
-
-        res.status(500).json({ message: "Something went wrong" });
-        console.log(error);
-    }
-};
+    res.status(500).json({ message: "Something went wrong" })
+    console.log(error)
+  }
+}

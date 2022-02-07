@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from "mongoose"
 import Task from './task.js'
 
 const goalSchema = mongoose.Schema({
@@ -11,7 +11,7 @@ const goalSchema = mongoose.Schema({
   endOn: { type: Date },
   active: { type: Boolean },
   tasks: { type: [Task.schema] }
-});
+})
 
-const Goal = mongoose.model("goal", goalSchema);
-export default Goal;
+const Goal = mongoose.model("goal", goalSchema)
+export default Goal

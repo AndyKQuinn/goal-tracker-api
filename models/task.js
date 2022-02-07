@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from 'mongoose'
 
 const taskSchema = mongoose.Schema({
   title: { type: String, required: true },
@@ -11,5 +11,5 @@ const taskSchema = mongoose.Schema({
   datesCompleted: { type: [String] },
 })
 
-const Task = mongoose.model("task", taskSchema);
-export default Task;
+const Task = mongoose.model("task", taskSchema)
+export default Task

@@ -1,76 +1,28 @@
 import bcrypt from "bcryptjs"
-import jwt from "jsonwebtoken"
 import dotenv from 'dotenv'
 import User from "../models/user.js"
 import * as EmailValidator from 'email-validator'
-import { randomStringGenerator, tokenGenerator } from '../helpers/auth.js'
+import {
+  tokenGenerator
+} from '../helpers/auth.js'
 
 dotenv.config()
 
 export const signin = async (req, res) => {
   const { email, password } = req.body
 
-  // no password means we're already authed via social login. check if user exists and create if needed
-  if (!password) {
-    socialLogin(req, res)
-  } else {
-    try {
-      const user = await User.findOne({ email })
-
-      if (!user) return res.status(200).json({ error: "Invalid login or password" })
-
-      const isPasswordCorrect = await bcrypt.compare(password, user.password)
-
-      if (!isPasswordCorrect) return res.status(200).json({ error: "Invalid login or password" })
-
-      const token = tokenGenerator(user)
-      console.log('Token: ', token)
-
-      res.status(200).json({ result: user, token })
-    } catch (err) {
-      res.status(500).json({ message: "Something went wrong" })
-    }
-  }
-}
-
-const socialLogin = async (req, res) => {
-  const {
-    email,
-    familyName,
-    givenName,
-    googleID,
-    imageUrl
-  } = req.body
-
   try {
     const user = await User.findOne({ email })
 
-    if (!user) {
-      const newUser = new User()
+    if (!user) return res.status(200).json({ error: "Invalid login or password" })
 
-      newUser.name = `${givenName} ${familyName}`
-      newUser.email = email
-      newUser.id = googleID
-      newUser.password = randomStringGenerator(20)
-      newUser.admin = false
-      newUser.imageUrl = imageUrl
+    const isPasswordCorrect = await bcrypt.compare(password, user.password)
 
-      const result = User.create(newUser)
+    if (!isPasswordCorrect) return res.status(200).json({ error: "Invalid login or password" })
 
-      const token = tokenGenerator(newUser)
-      console.log('Token: ', token)
+    const token = tokenGenerator(user)
 
-      result && res.status(200).json({ result: newUser, token })
-
-    } else {
-
-      const token = tokenGenerator(user)
-      console.log('Token: ', token)
-
-      res.status(200).json({ result: user, token })
-    }
-
-
+    res.status(200).json({ result: user, token })
   } catch (err) {
     res.status(500).json({ message: "Something went wrong" })
   }

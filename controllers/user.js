@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken"
 import dotenv from 'dotenv'
 import User from "../models/user.js"
 import * as EmailValidator from 'email-validator'
-import { randomStringGenerator } from '../helpers/auth.js'
+import { randomStringGenerator, tokenGenerator } from '../helpers/auth.js'
 
 dotenv.config()
 
@@ -23,16 +23,7 @@ export const signin = async (req, res) => {
 
       if (!isPasswordCorrect) return res.status(200).json({ error: "Invalid login or password" })
 
-      const token = jwt.sign(
-        {
-          email: user.email,
-          id: user._id
-        },
-        process.env.JWT_SECRET,
-        {
-          expiresIn: "4h"
-        }
-      )
+      const token = tokenGenerator(user)
 
       res.status(200).json({ result: user, token })
     } catch (err) {
@@ -64,7 +55,16 @@ const socialLogin = async (req, res) => {
       newUser.imageUrl = imageUrl
 
       const result = User.create(newUser)
-      result && res.status(200).json({ message: "New social auth user created successfully" })
+
+      const token = tokenGenerator(newUser)
+
+      result && res.status(200).json({ result: newUser, token })
+
+    } else {
+
+      const token = tokenGenerator(user)
+
+      res.status(200).json({ result: user, token })
     }
 
 
@@ -102,16 +102,7 @@ export const signup = async (req, res) => {
         admin: false
       })
 
-    const token = jwt.sign(
-      {
-        email: result.email,
-        id: result._id
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "4h"
-      }
-    )
+    const token = tokenGenerator(result)
 
     res.status(201).json({ result, token })
 

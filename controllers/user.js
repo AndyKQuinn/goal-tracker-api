@@ -1,10 +1,8 @@
 import bcrypt from "bcryptjs"
+import jwt from "jsonwebtoken"
 import dotenv from 'dotenv'
 import User from "../models/user.js"
 import * as EmailValidator from 'email-validator'
-import {
-  tokenGenerator
-} from '../helpers/auth.js'
 
 dotenv.config()
 
@@ -12,17 +10,26 @@ export const signin = async (req, res) => {
   const { email, password } = req.body
 
   try {
-    const user = await User.findOne({ email })
+    const oldUser = await User.findOne({ email })
 
-    if (!user) return res.status(200).json({ error: "Invalid login or password" })
+    if (!oldUser) return res.status(200).json({ error: "Invalid login or password" })
 
-    const isPasswordCorrect = await bcrypt.compare(password, user.password)
+    const isPasswordCorrect = await bcrypt.compare(password, oldUser.password)
 
     if (!isPasswordCorrect) return res.status(200).json({ error: "Invalid login or password" })
 
-    const token = tokenGenerator(user)
+    const token = jwt.sign(
+      {
+        email: oldUser.email,
+        id: oldUser._id
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "4h"
+      }
+    )
 
-    res.status(200).json({ result: user, token })
+    res.status(200).json({ result: oldUser, token })
   } catch (err) {
     res.status(500).json({ message: "Something went wrong" })
   }
@@ -43,9 +50,9 @@ export const signup = async (req, res) => {
     if (!EmailValidator.validate(email)) return res.status(200).json({ error: "Wrong email format" })
     if (!password || password?.trim()?.length === 0) return res.status(200).json({ error: "No password given" })
 
-    const user = await User.findOne({ email })
+    const oldUser = await User.findOne({ email })
 
-    if (user) return res.status(200).json({ error: "User already exists" })
+    if (oldUser) return res.status(200).json({ error: "User already exists" })
 
     const hashedPassword = await bcrypt.hash(password, 12)
 
@@ -53,12 +60,18 @@ export const signup = async (req, res) => {
       {
         email,
         password: hashedPassword,
-        name: `${firstName} ${lastName}`,
-        admin: false
+        name: `${firstName} ${lastName}`
       })
 
-    const token = tokenGenerator(result)
-    console.log('Token: ', token)
+    const token = jwt.sign(
+      {
+        email: result.email,
+        id: result._id
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "4h"
+      })
 
     res.status(201).json({ result, token })
 

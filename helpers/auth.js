@@ -23,6 +23,10 @@ export const tokenGenerator = (user) => {
       expiresIn: "4h"
     }
   )
+<<<<<<< HEAD
 
+=======
+  console.log('JWT: ', token)
+>>>>>>> 721283b047727b203bddf10d9d9535a6418c9c09
   return token
 }

@@ -24,6 +24,7 @@ export const signin = async (req, res) => {
       if (!isPasswordCorrect) return res.status(200).json({ error: "Invalid login or password" })
 
       const token = tokenGenerator(user)
+      console.log('Token: ', token)
 
       res.status(200).json({ result: user, token })
     } catch (err) {
@@ -57,12 +58,14 @@ const socialLogin = async (req, res) => {
       const result = User.create(newUser)
 
       const token = tokenGenerator(newUser)
+      console.log('Token: ', token)
 
       result && res.status(200).json({ result: newUser, token })
 
     } else {
 
       const token = tokenGenerator(user)
+      console.log('Token: ', token)
 
       res.status(200).json({ result: user, token })
     }
@@ -103,6 +106,7 @@ export const signup = async (req, res) => {
       })
 
     const token = tokenGenerator(result)
+    console.log('Token: ', token)
 
     res.status(201).json({ result, token })
 

@@ -1,4 +1,4 @@
-import express from "express";
+import express from "express"
 import {
   createGoal,
   getAllGoals,
@@ -6,16 +6,16 @@ import {
   getGoal,
   updateGoal,
   deleteGoal
-} from "../controllers/goals.js";
-import auth from "../middlewares/auth.js";
+} from "../controllers/goals.js"
+import auth from "../middlewares/auth.js"
 
-const router = express.Router();
+const router = express.Router()
 
-router.get("/", getAllGoals);
-router.get("/users/:id", getUserGoals);
-router.get("/:id", getGoal);
-router.post("/", createGoal);
-router.patch("/:id", auth, updateGoal);
-router.delete('/:id', auth, deleteGoal);
+router.get("/", getAllGoals)
+router.get("/users/:id", getUserGoals)
+router.get("/:id", getGoal)
+router.post("/", createGoal)
+router.patch("/:id", auth, updateGoal)
+router.delete('/:id', auth, deleteGoal)
 
-export default router;
+export default router
